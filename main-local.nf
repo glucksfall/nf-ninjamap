@@ -85,7 +85,7 @@ process ninjaMap_preprocessing {
 
     container "fischbachlab/nf-ninjamap:latest"
     cpus 16
-    memory 64.GB
+    memory 24.GB
     publishDir "${output_path}", mode:'copy'
 
     input:
@@ -105,7 +105,8 @@ process ninjaMap_preprocessing {
     export fastq1="${params.reads1}"
     export fastq2="${params.reads2}"
     export REFDBNAME="${params.db_prefix}"
-    export S3DBPATH="s3://maf-versioned/ninjamap/Index/${params.db}/db/"
+    #export S3DBPATH="s3://maf-versioned/ninjamap/Index/${params.db}/db/"
+    export S3DBPATH="${params.db}/db/bowtie2_index"
     export S3OUTPUTPATH="${output_path}"
     export STRAIN_MAP_FILENAME="${params.db_prefix}.ninjaIndex.binmap.csv"
     ninjaMap_nf_preprocessing.sh
@@ -120,8 +121,8 @@ process ninjaMap_preprocessing {
 process ninjaMap {
 
     container "fischbachlab/nf-ninjamap:latest"
-    cpus 32
-    memory { 256.GB * task.attempt }
+    cpus 16
+    memory { 24.GB * task.attempt }
     errorStrategy { task.exitStatus in 137..140 ? 'retry' : 'terminate' }
     maxRetries 2
 
@@ -134,7 +135,8 @@ process ninjaMap {
     script:
     """
     export REFDBNAME="${params.db_prefix}"
-    export S3DBPATH="s3://maf-versioned/ninjamap/Index/${params.db}/db/"
+    #export S3DBPATH="s3://maf-versioned/ninjamap/Index/${params.db}/db/"
+    export S3DBPATH="${params.db}/db/bowtie2_index"
     export S3OUTPUTPATH="${output_path}"
     export STRAIN_MAP_FILENAME="${params.db_prefix}.ninjaIndex.binmap.csv"
     ninjaMap_nf_core.sh

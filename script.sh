@@ -19,4 +19,5 @@ tar -pxvzf hCom2_20221117.ninjaIndex.tar.gz
 ln -sf data/* .
 
 # execute using nextflow 22.10.x
-/opt/checkouts/nextflow.STABLE-22.10.x/nextflow run main-local.nf --reads1 read1.fastq.gz --reads2 read2.fastq.gz --db /opt/developing/nf-ninjamap.glucksfall/hCom2_20221117.ninjaIndex/HCom2_20221117 --db_prefix HCom2 --output_path local --coreNum 8 --memPerCore 2G -profile docker
+mkdir /opt/developing/nf-ninjamap.glucksfall/local -p
+/opt/checkouts/nextflow.STABLE-22.10.x/nextflow run main-local.nf --reads1 read1.fastq.gz --reads2 read2.fastq.gz --db /opt/developing/nf-ninjamap.glucksfall/hCom2_20221117.ninjaIndex/HCom2_20221117 --db_prefix HCom2 --output_path /opt/developing/nf-ninjamap.glucksfall/local --coreNum 8 --memPerCore 2G -profile docker

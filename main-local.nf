@@ -136,7 +136,7 @@ process ninjaMap {
     """
     export REFDBNAME="${params.db_prefix}"
     #export S3DBPATH="s3://maf-versioned/ninjamap/Index/${params.db}/db/"
-    export S3DBPATH="${params.db}/db/bowtie2_index"
+    export S3DBPATH="${params.db}"
     export S3OUTPUTPATH="${output_path}"
     export STRAIN_MAP_FILENAME="${params.db_prefix}.ninjaIndex.binmap.csv"
     ninjaMap_nf_core.sh

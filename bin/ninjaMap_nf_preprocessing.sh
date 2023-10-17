@@ -267,4 +267,4 @@ fi
 
 
 # aws s3 sync --quiet "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"
-cp -r ${OUTPUTDIR}/ ${S3OUTPUTPATH}/
+cp -r ${LOCAL_OUTPUT}/* ${S3OUTPUTPATH}

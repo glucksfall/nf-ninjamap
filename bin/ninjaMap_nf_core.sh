@@ -50,9 +50,9 @@ mouse="${mouse:-0}"
 # REFDBNAME="uniform10x_ninjaIndex.ninjaIndex"
 # BINMAP_FILENAME="uniform10x_ninjaIndex.ninjaIndex.binmap.csv"
 
-S3DBPATH=${S3DBPATH:-"s3://maf-versioned/ninjamap/Index/SCv2_5_20210504/db/"}
-REFDBNAME=${REFDBNAME:-"SCv2_5"}
-STRAIN_MAP_FILENAME=${STRAIN_MAP_FILENAME:-"SCv2_5.ninjaIndex.binmap.csv"}
+# S3DBPATH=${S3DBPATH:-"s3://maf-versioned/ninjamap/Index/SCv2_5_20210504/db/"}
+# REFDBNAME=${REFDBNAME:-"SCv2_5"}
+# STRAIN_MAP_FILENAME=${STRAIN_MAP_FILENAME:-"SCv2_5.ninjaIndex.binmap.csv"}
 
 SAMPLE_NAME=$(basename ${S3OUTPUTPATH})
 
@@ -79,22 +79,24 @@ OUTPUT_PREFIX="${SAMPLE_NAME}.sortedByCoord"
 mkdir -p "${OUTPUTDIR}" "${LOCAL_OUTPUT}" "${LOG_DIR}" "${RAW_FASTQ}" "${QC_FASTQ}" "${STATS_DIR}" "${DOWNLOAD_DB}"
 mkdir -p "${LOCAL_DB_PATH}" "${BOWTIE2_OUTPUT}" "${NINJA_OUTPUT}" "${TMP_OUTPUTS}" "${GENOME_COV_OUTPUT}"
 
-trap '{aws s3 sync "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}";
-    rm -rf ${OUTPUTDIR} ;
-    exit 255; }' 1
+# trap '{aws s3 sync "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}";
+#     rm -rf ${OUTPUTDIR} ;
+#     exit 255; }' 1
 
 adapterFile="adapters,phix"
 # offLimitRegions="./data/combined_excluded_regions_threshold9.bed"
 scriptFolder="${LOCAL}/scripts"
-BOWTIE2_DB=${LOCAL_DB_PATH}/bowtie2_index/${REFDBNAME}
+BOWTIE2_DB=${LOCAL_DB_PATH}/db/bowtie2_index/${REFDBNAME}
 # REF_FASTA=${LOCAL_DB_PATH}/${REFDBNAME}.fna
 
 # Copy genome reference over
-aws s3 sync --quiet ${S3DBPATH}/ ${LOCAL_DB_PATH}/
-referenceNameFile=${LOCAL_DB_PATH}/${STRAIN_MAP_FILENAME}
+# aws s3 sync --quiet ${S3DBPATH}/ ${LOCAL_DB_PATH}/
+cp -r ${S3DBPATH}/ ${LOCAL_DB_PATH}/
+referenceNameFile=${LOCAL_DB_PATH}/HCom2_20221117/db/${STRAIN_MAP_FILENAME}
 
 # copy bam and index files
-aws s3 sync --quiet "${S3OUTPUTPATH}/bowtie2/" ${BOWTIE2_OUTPUT}
+# aws s3 sync --quiet "${S3OUTPUTPATH}/bowtie2/" ${BOWTIE2_OUTPUT}
+cp -r ${S3OUTPUTPATH}/bowtie2/* ${BOWTIE2_OUTPUT}
 
 echo "Starting to Process Sample: "${SAMPLE_NAME}
 
@@ -117,4 +119,5 @@ printf 'This AWSome pipeline took: %02d:%02d:%02d\n' $hrs $mins $secs > ${LOCAL_
 echo "Live long and prosper" >> ${LOCAL_OUTPUT}/job.complete
 ############################ PEACE! ################################
 ## Sync output
-aws s3 sync --quiet "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"
+# aws s3 sync --quiet "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"
+cp -r "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"

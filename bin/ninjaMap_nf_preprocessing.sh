@@ -50,9 +50,9 @@ mouse="${mouse:-0}"
 # REFDBNAME="uniform10x_ninjaIndex.ninjaIndex"
 # BINMAP_FILENAME="uniform10x_ninjaIndex.ninjaIndex.binmap.csv"
 
-S3DBPATH=${S3DBPATH:-"s3://maf-versioned/ninjamap/Index/SCv2_5_20210504/db/"}
-REFDBNAME=${REFDBNAME:-"SCv2_5"}
-STRAIN_MAP_FILENAME=${STRAIN_MAP_FILENAME:-"SCv2_5.ninjaIndex.binmap.csv"}
+# S3DBPATH=${S3DBPATH:-"s3://maf-versioned/ninjamap/Index/SCv2_5_20210504/db/"}
+# REFDBNAME=${REFDBNAME:-"SCv2_5"}
+# STRAIN_MAP_FILENAME=${STRAIN_MAP_FILENAME:-"SCv2_5.ninjaIndex.binmap.csv"}
 
 SAMPLE_NAME=$(basename ${S3OUTPUTPATH})
 
@@ -79,18 +79,19 @@ OUTPUT_PREFIX="${SAMPLE_NAME}.sortedByCoord"
 mkdir -p "${OUTPUTDIR}" "${LOCAL_OUTPUT}" "${LOG_DIR}" "${RAW_FASTQ}" "${QC_FASTQ}" "${STATS_DIR}" "${DOWNLOAD_DB}"
 mkdir -p "${LOCAL_DB_PATH}" "${BOWTIE2_OUTPUT}" "${NINJA_OUTPUT}" "${TMP_OUTPUTS}" "${GENOME_COV_OUTPUT}"
 
-trap '{aws s3 sync "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}";
-    rm -rf ${OUTPUTDIR} ;
-    exit 255; }' 1
+# trap '{aws s3 sync "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}";
+#     rm -rf ${OUTPUTDIR} ;
+#     exit 255; }' 1
 
 adapterFile="adapters,phix"
 # offLimitRegions="./data/combined_excluded_regions_threshold9.bed"
 scriptFolder="./scripts"
-BOWTIE2_DB=${LOCAL_DB_PATH}/bowtie2_index/${REFDBNAME}
+BOWTIE2_DB=${LOCAL_DB_PATH}/${REFDBNAME}
 # REF_FASTA=${LOCAL_DB_PATH}/${REFDBNAME}.fna
 
 # Copy genome reference over
-aws s3 sync --quiet ${S3DBPATH}/ ${LOCAL_DB_PATH}/
+# aws s3 sync --quiet ${S3DBPATH}/ ${LOCAL_DB_PATH}/
+cp ${S3DBPATH}/* ${LOCAL_DB_PATH}
 referenceNameFile=${LOCAL_DB_PATH}/${STRAIN_MAP_FILENAME}
 
 # Constant definitions for bbduk
@@ -102,8 +103,10 @@ min_kmer_value=${min_kmer_value:-11}
 echo "Starting to Process Sample: "${SAMPLE_NAME}
 
 # Copy fastq.gz files from S3, only 2 files per sample
-aws s3 cp --quiet ${fastq1} ${RAW_FASTQ}/read1.fastq.gz
-aws s3 cp --quiet ${fastq2} ${RAW_FASTQ}/read2.fastq.gz
+# aws s3 cp --quiet ${fastq1} ${RAW_FASTQ}/read1.fastq.gz
+cp ${fastq1} ${RAW_FASTQ}/read1.fastq.gz
+# aws s3 cp --quiet ${fastq2} ${RAW_FASTQ}/read2.fastq.gz
+cp ${fastq2} ${RAW_FASTQ}/read2.fastq.gz
 
 # Downsample reads to get results faster
 reformat.sh \
@@ -263,4 +266,5 @@ fi
 
 
 
-aws s3 sync --quiet "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"
+# aws s3 sync --quiet "${LOCAL_OUTPUT}" "${S3OUTPUTPATH}"
+cp -r ${OUTPUTDIR}/ ${S3OUTPUTPATH}/
